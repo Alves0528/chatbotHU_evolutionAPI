@@ -1,0 +1,21 @@
+{
+  "name": "ambulatorio-hu-chatbot",
+  "version": "1.0.0",
+  "description": "Servidor de webhook para chatbot do WhatsApp (Ambulatório HU) integrado à Evolution API, com suporte a botões e listas interativas.",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": ["whatsapp", "evolution-api", "chatbot", "webhook"],
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
