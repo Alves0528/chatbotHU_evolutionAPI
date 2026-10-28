@@ -21,12 +21,60 @@ const {
 // -------------------------------------------------------------------------
 const validators = {
   cpf: (value) => /^\d{11}$/.test(value.replace(/\D/g, '')),
-  data: (value) => /^\d{2}\/\d{2}\/\d{4}$/.test(value.trim()),
+
+  data: (value) => {
+    // 1. Verifica o formato DD/MM/AAAA
+    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(value.trim())) return false;
+
+    // 2. Separa dia, mês e ano para criar o objeto Date
+    const [day, month, year] = value.trim().split('/');
+    const dateProvided = new Date(year, month - 1, day);
+    
+    // 3. Pega a data de hoje e zera as horas para comparar apenas os dias
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 4. Retorna true apenas se a data informada for maior ou igual a hoje
+    return dateProvided > today;
+  },
+
+  dateTime: (value) => {
+    // Captura os blocos de números aceitando espaço ou a palavra "às" entre a data e a hora
+    const regex = /^(\d{2})\/(\d{2})\/(\d{4})(?:\s+às\s+|\s+)(\d{2}):(\d{2})$/i;
+    const match = value.trim().match(regex);
+
+    if (!match) return false;
+
+    // Desestrutura os valores encontrados pela expressão regular
+    const [, dia, mes, ano, hora, minuto] = match;
+    const dataConsulta = new Date(ano, mes - 1, dia, hora, minuto);
+
+    // Valida se a data é real (evita dias como 31/02 ou meses como 13)
+    if (
+      dataConsulta.getFullYear() != ano ||
+      dataConsulta.getMonth() != mes - 1 ||
+      dataConsulta.getDate() != dia ||
+      dataConsulta.getHours() != hora ||
+      dataConsulta.getMinutes() != minuto
+    ) {
+      return false;
+    }
+
+    // Compara com o exato momento atual para garantir que a consulta ainda vai acontecer
+    const agora = new Date();
+    return dataConsulta > agora;
+  },
+
 };
+
+const validationDateTime = (value) => {
+  
+}
 
 const validationMessages = {
   cpf: 'CPF inválido. Digite apenas os 11 números, sem pontos ou traços (ex.: 01234567899).',
-  data: 'Data inválida. Use o formato DD/MM/AAAA (ex.: 01/01/2026).',
+  data: 'Data inválida ou já ultrapassada. Use uma data futura no formato DD/MM/AAAA (ex.: 01/01/2026).',
+  dateTime: 'Data/horário inválido ou já ultrapassado. Use o formato DD/MM/AAAA HH:MM (ex.: 25/10/2026 14:00).',
 };
 
 // -------------------------------------------------------------------------

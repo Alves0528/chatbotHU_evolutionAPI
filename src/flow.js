@@ -18,33 +18,6 @@ const pages = [
     displayName: 'Start',
     inputType: 'text_menu',
     text:
-      "Olá, antes de começarmos gostaria que escolhesse o idioma em que você prefere ser atendido.\n",
-    options: [
-      { id: 'idioma_pt', title: 'Português Brasileiro' },
-      { id: 'idioma_guarani', title: 'Guarani' },
-    ],
-    transitions: {
-      idioma_pt: 'Selecionar Setor',
-      idioma_guarani: 'Selecionar Setor',
-    },
-  },
-  {
-    displayName: 'Selecionar Setor',
-    inputType: 'text_menu',
-    text: 'Sobre qual setor gostaria de ajuda?',
-    options: [
-      { id: 'setor_ambulatorio', title: 'Ambulatório' },
-      { id: 'setor_outros', title: 'Outros Setores' },
-    ],
-    transitions: {
-      setor_ambulatorio: 'Termos de Serviço',
-      setor_outros: 'Termos de Serviço',
-    },
-  },
-  {
-    displayName: 'Termos de Serviço',
-    inputType: 'text_menu',
-    text:
       'Olá! Sou o assistente digital do HU.\n' +
       'Para iniciarmos o atendimento no Ambulatório, você aceita nossos Termos de Serviço e Privacidade?\n' +
       'Lembramos que não é permitido o envio de documentos e imagens neste canal.',
@@ -53,10 +26,53 @@ const pages = [
       { id: 'termos_nao', title: 'Não' },
     ],
     transitions: {
-      termos_sim: 'Solicitar CPF',
+      termos_sim: 'Idioma',
       termos_nao: 'Encerramento',
     },
   },
+
+  {
+    displayName: 'Idioma',
+    inputType: 'text_menu',
+    text:
+      "Escolha o idioma em que você prefere ser atendido.\n",
+    options: [
+      { id: 'idioma_pt', title: 'Português Brasileiro' },
+      { id: 'idioma_guarani', title: 'Guarani' },
+    ],
+    transitions: {
+      idioma_pt: 'Selecionar Idioma Português',
+      idioma_guarani: 'Selecionar Idioma Guarani',
+    },
+  },
+
+  {
+    displayName: 'Selecionar Idioma Português',
+    inputType: 'text_menu',
+    text: 'Sobre qual setor gostaria de ajuda?',
+    options: [
+      { id: 'setor_ambulatorio', title: 'Ambulatório' },
+      { id: 'setor_outros', title: 'Outros Setores' },
+    ],
+    transitions: {
+      setor_ambulatorio: 'Solicitar CPF',
+      setor_outros: 'Outros Setores',
+    },
+  },
+
+  {
+    displayName: 'Selecionar Idioma Guarani',
+    inputType: 'auto', 
+    text: 'Serviço em Guarani ainda não disponível. Encerrando atendimento.',
+    nextPage: 'Encerramento', 
+  },
+  {
+    displayName: 'Outros Setores',
+    inputType: 'auto', 
+    text: 'Serviço ainda não disponível. Encerrando atendimento.',
+    nextPage: 'Encerramento',
+  },
+  
   {
     displayName: 'Solicitar CPF',
     inputType: 'text',
@@ -65,6 +81,7 @@ const pages = [
     validate: 'cpf',
     nextPage: 'Menu Principal',
   },
+
   {
     displayName: 'Menu Principal',
     inputType: 'text_menu',
@@ -73,13 +90,16 @@ const pages = [
       { id: 'menu_remarcar', title: 'Remarcar' },
       { id: 'menu_cancelar', title: 'Cancelar' },
       { id: 'menu_consultas', title: 'Ver Consultas' },
+      { id: 'menu_sair', title: 'Encerrar Atendimento' } // <-- Nova opção
     ],
     transitions: {
       menu_remarcar: 'Selecionar Especialidade Remarcar',
-      menu_cancelar: 'Informar Consulta Cancelar',
+      menu_cancelar: 'Informar Medico Cancelar',
       menu_consultas: 'Exibir Consultas',
+      menu_sair: 'Encerramento' // <-- Rota de fuga
     },
   },
+
   {
     displayName: 'Selecionar Especialidade Remarcar',
     inputType: 'text',
@@ -107,12 +127,20 @@ const pages = [
     inputType: 'auto',
     text: 'Seu pedido de remarcação foi registrado! Nossa equipe entrará em contato em breve para confirmar o novo horário.',
     nextPage: 'Encerramento',
+  }, 
+  {
+    displayName: 'Informar Medico Cancelar',
+    inputType: 'text',
+    text: 'Qual o nome do médico da consulta que deseja cancelar?',
+    saveAs: 'medicoCancelar',
+    nextPage: 'Informar Data Cancelar', 
   },
   {
-    displayName: 'Informar Consulta Cancelar',
+    displayName: 'Informar Data Cancelar',
     inputType: 'text',
-    text: 'Pode me informar a data/horário ou o nome do médico da consulta que deseja cancelar?',
-    saveAs: 'consultaCancelar',
+    text: 'Qual a data e o horário dessa consulta? (ex.: 25/10/2026 às 14:00)',
+    saveAs: 'dataHoraCancelar',
+    validate: 'dateTime',
     nextPage: 'Sucesso Cancelamento',
   },
   {
